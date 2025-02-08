@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: springboot-kafka
+  # kafka 连接地址
+  kafka:
+    bootstrap-servers: 192.168.147.128:9092
+    # 生产者
+#    producer:
+    # 消费者
+    consumer:
+      # 将偏移量设置到最早  读取历史消息
+      auto-offset-reset: earliest
+
+
+
