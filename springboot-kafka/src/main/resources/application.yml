@@ -10,6 +10,8 @@ spring:
     consumer:
       # 将偏移量设置到最早  读取历史消息
       auto-offset-reset: earliest
-
+    # 设置默认主题
+    template:
+      default-topic: default-topic
 
 
