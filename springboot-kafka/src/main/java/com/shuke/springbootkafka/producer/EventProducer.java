@@ -1,16 +1,20 @@
 package com.shuke.springbootkafka.producer;
 
+import cn.hutool.core.util.ObjectUtil;
 import jakarta.annotation.Resource;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Component
 public class EventProducer {
@@ -37,7 +41,7 @@ public class EventProducer {
         Headers headers = new RecordHeaders();
         headers.add("name","zhang-san".getBytes(StandardCharsets.UTF_8));
         headers.add("orderID","OD123456789".getBytes(StandardCharsets.UTF_8));
-        ProducerRecord<String,String> record = new ProducerRecord<>(
+        ProducerRecord<String,String> record = new ProducerRecord(
                 topic,
                 0,
                 System.currentTimeMillis(),
@@ -53,9 +57,74 @@ public class EventProducer {
     }
 
     /**
-        sendDefault 在配置文件里设置好默认主题
+     * sendDefault 在配置文件里设置好默认主题
      */
     public void sendDefault(String message){
         kafkaTemplate.sendDefault(0, System.currentTimeMillis(), "k2", message);
+    }
+
+    /**
+     * 同步阻塞拿到返回结果
+     */
+    public void sendDefault01(String message){
+        // 异步返回的对象
+        CompletableFuture<SendResult<String, String>> completableFuture
+                = kafkaTemplate.sendDefault(0, System.currentTimeMillis(), "k3", message);
+        try {
+            // 阻塞等待拿到返回结果
+            SendResult<String,String> sendResult = completableFuture.get();
+            try {
+                // 模拟耗时操作
+                for (int i= 0 ; i<4;i++){
+                    System.out.println("模拟耗时："+i);
+                    Thread.sleep(3000);
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if(ObjectUtil.isNotNull(sendResult.getRecordMetadata())){
+                // kafka 服务器 已经接受到了信息
+                System.out.println("消息发送成功：" + sendResult.getRecordMetadata().topic());
+            }
+            System.out.println("producerRecord: " + sendResult.getProducerRecord());
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 异步回调  使用thenAccept() thenApply() 等注册回调函数
+     */
+    public void sendDefault02(String message){
+        // 异步返回的对象
+        CompletableFuture<SendResult<String, String>> completableFuture
+                = kafkaTemplate.sendDefault(0, System.currentTimeMillis(), "k3", message);
+
+
+        try {
+            // 非阻塞的方式拿结果
+            completableFuture.thenAccept((sendResult) -> {
+                try {
+                    // 模拟耗时操作
+                    for (int i= 0 ; i<4;i++){
+                        System.out.println("模拟耗时："+i);
+                        Thread.sleep(3000);
+                    }
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (ObjectUtil.isNotNull(sendResult.getRecordMetadata())) {
+                    System.out.println("消息发送成功：" + sendResult.getRecordMetadata().topic());
+                }
+                System.out.println("producerRecord: " + sendResult.getProducerRecord());
+            }).exceptionally(throwable -> {
+                System.out.println("消息发送失败： " + throwable.getMessage());
+                return null;
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
