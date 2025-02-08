@@ -3,7 +3,7 @@ spring:
     name: springboot-kafka
   # kafka 连接地址
   kafka:
-    bootstrap-servers: 192.168.147.128:9092
+    bootstrap-servers: 127.0.0.1:9092
     # 生产者
     producer:
       # 默认是 StringSerializer.class
