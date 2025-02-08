@@ -5,7 +5,9 @@ spring:
   kafka:
     bootstrap-servers: 192.168.147.128:9092
     # 生产者
-#    producer:
+    producer:
+      # 默认是 StringSerializer.class
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     # 消费者
     consumer:
       # 将偏移量设置到最早  读取历史消息

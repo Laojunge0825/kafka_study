@@ -1,6 +1,7 @@
 package com.shuke.springbootkafka.producer;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.shuke.springbootkafka.model.User;
 import jakarta.annotation.Resource;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Headers;
@@ -21,6 +22,9 @@ public class EventProducer {
 
     @Resource
     private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Resource
+    private KafkaTemplate<Object, Object> kafkaTemplate2;
 
     public void send(String topic, String message) {
         kafkaTemplate.send(topic, message);
@@ -126,5 +130,14 @@ public class EventProducer {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 发送对象
+     */
+    public void sendObj(){
+        User user = User.builder().id(1001).age(10).name("张三").build();
+        /// 分区为 null  让Kafka自己决定放到那个分区
+        kafkaTemplate2.sendDefault(null,System.currentTimeMillis(),"key",user);
     }
 }
