@@ -6,8 +6,14 @@ spring:
     bootstrap-servers: 127.0.0.1:9092
     # 生产者
     producer:
-      # 默认是 StringSerializer.class
+      # value的序列化器 默认是 StringSerializer.class
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      # key的序列化器
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # 配置轮询分区器
+      properties:
+        partitioner:
+          class: org.apache.kafka.clients.producer.RoundRobinPartitioner
     # 消费者
     consumer:
       # 将偏移量设置到最早  读取历史消息

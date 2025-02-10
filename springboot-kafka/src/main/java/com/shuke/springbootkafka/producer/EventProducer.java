@@ -24,10 +24,10 @@ public class EventProducer {
     private KafkaTemplate<String, String> kafkaTemplate;
 
     @Resource
-    private KafkaTemplate<Object, Object> kafkaTemplate2;
+    private KafkaTemplate<String, Object> kafkaTemplate2;
 
     public void send(String topic, String message) {
-        kafkaTemplate.send(topic, message);
+        kafkaTemplate2.send(topic,null, message);
     }
 
     public void send2(String topic, String message) {
@@ -57,7 +57,7 @@ public class EventProducer {
     }
 
     public void send4(String topic, String message) {
-        kafkaTemplate.send(topic, 0, System.currentTimeMillis(), "k2", message);
+        kafkaTemplate.send(topic, null, System.currentTimeMillis(), "k1", message);
     }
 
     /**
