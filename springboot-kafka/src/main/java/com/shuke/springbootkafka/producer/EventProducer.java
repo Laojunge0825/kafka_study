@@ -27,7 +27,7 @@ public class EventProducer {
     private KafkaTemplate<String, Object> kafkaTemplate2;
 
     public void send(String topic, String message) {
-        kafkaTemplate2.send(topic,null, message);
+        kafkaTemplate2.send(topic, message);
     }
 
     public void send2(String topic, String message) {

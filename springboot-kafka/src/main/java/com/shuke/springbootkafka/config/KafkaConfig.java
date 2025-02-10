@@ -13,6 +13,7 @@ import org.springframework.kafka.core.ProducerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+
 @Configuration
 public class KafkaConfig {
 
@@ -32,7 +33,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic newTopic() {
 
-        return new NewTopic("shuke-topic04", 4, (short) 1);
+        return new NewTopic("shuke-topic08", 4, (short) 1);
     }
 
     /**
@@ -44,7 +45,7 @@ public class KafkaConfig {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
         /// 指定分区策略  这里时指定轮询策略
-        props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, RoundRobinPartitioner.class);
+        props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomerPartitioner.class);
         return props;
     }
 
@@ -58,6 +59,7 @@ public class KafkaConfig {
     /**
      * kafkaTemplate 覆盖默认配置类中的kafkaTemplate
      */
+    @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
         System.out.println("使用新的KafkaTemplate");
         return new KafkaTemplate<>(producerFactory());
