@@ -21,5 +21,7 @@ spring:
     # 设置默认主题
     template:
       default-topic: default-topic
-
+    listener:
+      # 手动提交
+      ack-mode: manual
 
