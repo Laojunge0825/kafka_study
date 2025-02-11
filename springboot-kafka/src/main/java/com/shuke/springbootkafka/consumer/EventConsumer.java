@@ -5,6 +5,8 @@ import cn.hutool.json.JSONUtil;
 import com.shuke.springbootkafka.model.User;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.PartitionOffset;
+import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -35,8 +37,31 @@ public class EventConsumer {
         System.out.println("User对象：" + user.toString());
     }
 
-    @KafkaListener(topics = { "shukeTopic" } , groupId = "shukeGroup")
+//    @KafkaListener(topics = { "shukeTopic" } , groupId = "shukeGroup")
     public void onEvent2(@Payload String event,
+                         @Header(value = KafkaHeaders.RECEIVED_TOPIC) String topic,
+                         @Header(value = KafkaHeaders.RECEIVED_PARTITION) int partition,
+                         @Header(value = KafkaHeaders.OFFSET) int offset,
+                         Acknowledgment ack){
+
+        try {
+            System.out.println("读取到的事件：" + event + ", 主题：" + topic + ", 分区：" + partition + ", 偏移量：" + offset);
+            // 手动提交   手动确认消息
+            ack.acknowledge();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @KafkaListener(groupId = "shukeGroup01" , topicPartitions = {
+            @TopicPartition(topic = "shukeTopic01",
+                    partitions = {"0,1,2"},
+                    partitionOffsets = {
+                        @PartitionOffset(partition = "3", initialOffset = "2"),
+                        @PartitionOffset(partition = "4", initialOffset = "7"),
+                    })
+    })
+    public void onEvent3(@Payload String event,
                          @Header(value = KafkaHeaders.RECEIVED_TOPIC) String topic,
                          @Header(value = KafkaHeaders.RECEIVED_PARTITION) int partition,
                          @Header(value = KafkaHeaders.OFFSET) int offset,

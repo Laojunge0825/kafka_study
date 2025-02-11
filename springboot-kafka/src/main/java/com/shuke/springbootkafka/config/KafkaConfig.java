@@ -33,7 +33,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic newTopic() {
 
-        return new NewTopic("shuke-topic08", 4, (short) 1);
+        return new NewTopic("shukeTopic01", 5, (short) 1);
     }
 
     /**

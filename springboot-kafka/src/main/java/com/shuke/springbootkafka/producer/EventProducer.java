@@ -152,4 +152,15 @@ public class EventProducer {
         /// 分区为 null  让Kafka自己决定放到那个分区
         kafkaTemplate2.sendDefault(null,System.currentTimeMillis(),"key", user);
     }
+
+
+    public void sendEvent1(){
+        for(int i = 0; i < 20; i++){
+            User user = new User();
+            user.setId(i);
+            user.setAge(i+10);
+            user.setName("张三"+i);
+            kafkaTemplate2.send("shukeTopic01","key:"+i, user);
+        }
+    }
 }
