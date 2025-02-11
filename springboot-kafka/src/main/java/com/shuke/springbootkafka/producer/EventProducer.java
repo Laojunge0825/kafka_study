@@ -60,6 +60,14 @@ public class EventProducer {
         kafkaTemplate.send(topic, null, System.currentTimeMillis(), "k1", message);
     }
 
+    public void sendObj(String topic) {
+        User user = new User();
+        user.setId(1001);
+        user.setAge(10);
+        user.setName("张三");
+        kafkaTemplate2.send(topic, null, System.currentTimeMillis(), "k1", user);
+    }
+
     /**
      * sendDefault 在配置文件里设置好默认主题
      */
@@ -136,8 +144,12 @@ public class EventProducer {
      * 发送对象
      */
     public void sendObj(){
-        User user = User.builder().id(1001).age(10).name("张三").build();
+//        User user = User.builder().id(1001).age(10).name("张三").build();
+        User user = new User();
+        user.setId(1001);
+        user.setAge(10);
+        user.setName("张三");
         /// 分区为 null  让Kafka自己决定放到那个分区
-        kafkaTemplate2.sendDefault(null,System.currentTimeMillis(),"key",user);
+        kafkaTemplate2.sendDefault(null,System.currentTimeMillis(),"key", user);
     }
 }
