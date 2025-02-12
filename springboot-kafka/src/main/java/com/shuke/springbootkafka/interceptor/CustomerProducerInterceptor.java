@@ -1,12 +1,15 @@
-package com.shuke.springbootkafka.config;
+package com.shuke.springbootkafka.interceptor;
 
 import cn.hutool.core.util.ObjUtil;
-import org.apache.kafka.clients.producer.ProducerInterceptor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.clients.producer.ProducerInterceptor;
 
 import java.util.Map;
 
+/**
+ * 生产者拦截器
+ */
 public class CustomerProducerInterceptor implements ProducerInterceptor<String, Object> {
 
     /**
@@ -16,13 +19,13 @@ public class CustomerProducerInterceptor implements ProducerInterceptor<String, 
      */
     @Override
     public ProducerRecord<String, Object> onSend(ProducerRecord<String, Object> producerRecord) {
-        System.out.println("拦截器 onSend 方法被调用");
-        System.out.println("拦截信息："+producerRecord.toString());
+        System.out.println("生产者拦截器  -- 拦截信息："+producerRecord.toString());
         return producerRecord;
     }
 
     /**
-     * 服务器收到消息后的确认
+     *  在消息发送成功或失败时被调用
+     *  可以在消息发送成功或失败时进行一些额外的处理，比如记录日志、更新数据库等操作
      */
     @Override
     public void onAcknowledgement(RecordMetadata recordMetadata, Exception e) {

@@ -1,14 +1,16 @@
 package com.shuke.springbootkafka.config;
 
+import com.shuke.springbootkafka.interceptor.CustomerConsumerInterceptor;
+import com.shuke.springbootkafka.interceptor.CustomerProducerInterceptor;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.RoundRobinPartitioner;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.KafkaListenerContainerFactory;
+import org.springframework.kafka.core.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +28,13 @@ public class KafkaConfig {
 
     @Value("${spring.kafka.producer.key-serializer}")
     private String keySerializer;
+
+    /// 反序列化
+    @Value("${spring.kafka.consumer.value-deserializer}")
+    private String valueDeserializer;
+
+    @Value("${spring.kafka.consumer.key-deserializer}")
+    private String keyDeserializer;
 
     /**
      * 初始化topic  自定义分区和副本因子
@@ -47,7 +56,7 @@ public class KafkaConfig {
         /// 指定分区策略  这里时指定自定义的轮询策略
         props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomerPartitioner.class.getName());
 
-        // 配置拦截器
+        // 配置生产者拦截器
         props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, CustomerProducerInterceptor.class.getName());
         return props;
     }
@@ -60,11 +69,41 @@ public class KafkaConfig {
     }
 
     /**
+     * 消费者相关配置
+     */
+    public Map<String, Object> consumerConfigs() {
+        Map<String, Object> props = new HashMap<>(6);
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, valueDeserializer);
+        // 配置消费者拦截器
+        props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, CustomerConsumerInterceptor.class.getName());
+        return props;
+    }
+    /**
+     * 消费者工厂
+     */
+    public ConsumerFactory<String, Object> consumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(consumerConfigs());
+    }
+
+    /**
      * kafkaTemplate 覆盖默认配置类中的kafkaTemplate
      */
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
         System.out.println("使用新的KafkaTemplate");
         return new KafkaTemplate<>(producerFactory());
+    }
+
+    /**
+     * 自定义监听容器工厂  使用自定义的消费者工厂
+     */
+    @Bean
+    public KafkaListenerContainerFactory<?> CustomerKafkaListenerContainerFactory() {
+        System.out.println("自定义监听器容器工厂");
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory());
+        return factory;
     }
 }
