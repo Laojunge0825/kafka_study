@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 自定义分区器
+ * 自定义生产者分区器
  */
-public class CustomerPartitioner implements Partitioner {
+public class CustomerProducerPartitioner implements Partitioner {
 
     private AtomicInteger nextPartition = new AtomicInteger(0);
 

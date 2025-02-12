@@ -15,7 +15,6 @@ public class CustomerProducerInterceptor implements ProducerInterceptor<String, 
     /**
      *  在消息发送之前被调用
      *  可以对消息进行修改、添加自定义的消息头、记录日志等操作
-     * @return
      */
     @Override
     public ProducerRecord<String, Object> onSend(ProducerRecord<String, Object> producerRecord) {

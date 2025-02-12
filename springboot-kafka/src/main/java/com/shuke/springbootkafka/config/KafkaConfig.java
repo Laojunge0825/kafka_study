@@ -42,7 +42,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic newTopic() {
 
-        return new NewTopic("shukeTopic01", 5, (short) 1);
+        return new NewTopic("myTopic04", 10, (short) 1);
     }
 
     /**
@@ -54,7 +54,7 @@ public class KafkaConfig {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
         /// 指定分区策略  这里时指定自定义的轮询策略
-        props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomerPartitioner.class.getName());
+        props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomerProducerPartitioner.class.getName());
 
         // 配置生产者拦截器
         props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, CustomerProducerInterceptor.class.getName());
