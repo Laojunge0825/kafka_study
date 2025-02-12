@@ -18,10 +18,15 @@ spring:
     consumer:
       # 将偏移量设置到最早  读取历史消息
       auto-offset-reset: earliest
+      # 批量消费 每次最多取多少条
+      max-poll-records: 20
     # 设置默认主题
     template:
       default-topic: default-topic
+    # 配置消息监听
     listener:
       # 手动提交
       ack-mode: manual
+      # 批量提交
+      type: batch
 
