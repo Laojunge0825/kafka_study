@@ -4,6 +4,7 @@ import com.shuke.springbootkafka.interceptor.CustomerConsumerInterceptor;
 import com.shuke.springbootkafka.interceptor.CustomerProducerInterceptor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.RoundRobinAssignor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +36,9 @@ public class KafkaConfig {
 
     @Value("${spring.kafka.consumer.key-deserializer}")
     private String keyDeserializer;
+
+    @Value("${spring.kafka.consumer.auto-offset-reset}")
+    private String autoOffsetReset;
 
     /**
      * 初始化topic  自定义分区和副本因子
@@ -76,8 +80,11 @@ public class KafkaConfig {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, valueDeserializer);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset);
         // 配置消费者拦截器
-        props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, CustomerConsumerInterceptor.class.getName());
+//        props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, CustomerConsumerInterceptor.class.getName());
+        // 指定分区策略  指定轮询的分区策略
+        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, RoundRobinAssignor.class.getName());
         return props;
     }
     /**

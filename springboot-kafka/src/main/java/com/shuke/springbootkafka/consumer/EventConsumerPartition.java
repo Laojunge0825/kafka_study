@@ -17,10 +17,11 @@ public class EventConsumerPartition {
      * 表示该方法将被并发执行，并发数量为 3。
      *
      */
-    @KafkaListener(topics = {"myTopic04"}, groupId = "myGroup03",concurrency = "3")
-    public void onEvent(List<ConsumerRecord<String, String>> records) {
-        for (ConsumerRecord<String, String> record : records) {
+    @KafkaListener(topics = {"myTopic04"}, groupId = "myGroup05",concurrency = "3",
+            containerFactory = "CustomerKafkaListenerContainerFactory")
+    public void onEvent(ConsumerRecord<String, String> record) {
+
             System.out.println(Thread.currentThread().getId()+"   --- 消费消息：" + record);
-        }
+
     }
 }
